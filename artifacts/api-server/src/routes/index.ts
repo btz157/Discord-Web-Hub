@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import healthRouter from "./health";
+import authRouter from "./auth";
 import dashboardRouter from "./dashboard";
 import membersRouter from "./members";
 import warnsRouter from "./warns";
@@ -14,7 +15,11 @@ import discordRouter from "./discord";
 
 const router: IRouter = Router();
 
+// Auth routes — no protection needed
 router.use(healthRouter);
+router.use(authRouter);
+
+// Protected routes below
 router.use(dashboardRouter);
 router.use(membersRouter);
 router.use(warnsRouter);

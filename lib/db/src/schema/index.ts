@@ -7,3 +7,4 @@ export * from "./anuncios";
 export * from "./config";
 export * from "./logs";
 export * from "./activity";
+export * from "./sessions";
