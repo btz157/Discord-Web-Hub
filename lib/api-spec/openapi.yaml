@@ -520,6 +520,56 @@ paths:
               schema:
                 $ref: "#/components/schemas/BotConfig"
 
+  /discord/channels:
+    get:
+      operationId: getDiscordChannels
+      tags: [discord]
+      summary: List guild channels from Discord
+      responses:
+        "200":
+          description: List of channels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordChannel"
+
+  /discord/roles:
+    get:
+      operationId: getDiscordRoles
+      tags: [discord]
+      summary: List guild roles from Discord
+      responses:
+        "200":
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordRole"
+
+  /discord/members:
+    get:
+      operationId: getDiscordMembers
+      tags: [discord]
+      summary: List guild members from Discord
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscordMember"
+
   /logs:
     get:
       operationId: listLogs
@@ -911,6 +961,55 @@ components:
           type: integer
         muteRoleId:
           type: string
+
+    DiscordChannel:
+      type: object
+      required: [id, name, type]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        parentId:
+          type: ["string", "null"]
+        parentName:
+          type: ["string", "null"]
+        position:
+          type: integer
+
+    DiscordRole:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        color:
+          type: string
+        position:
+          type: integer
+        managed:
+          type: boolean
+
+    DiscordMember:
+      type: object
+      required: [id, username]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        roles:
+          type: array
+          items:
+            type: string
 
     LogEntry:
       type: object

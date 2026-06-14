@@ -477,6 +477,50 @@ export const UpdateConfigResponse = zod.object({
 
 
 /**
+ * @summary List guild channels from Discord
+ */
+export const GetDiscordChannelsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "type": zod.string(),
+  "parentId": zod.string().nullish(),
+  "parentName": zod.string().nullish(),
+  "position": zod.number().optional()
+})
+export const GetDiscordChannelsResponse = zod.array(GetDiscordChannelsResponseItem)
+
+
+/**
+ * @summary List guild roles from Discord
+ */
+export const GetDiscordRolesResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "color": zod.string().optional(),
+  "position": zod.number().optional(),
+  "managed": zod.boolean().optional()
+})
+export const GetDiscordRolesResponse = zod.array(GetDiscordRolesResponseItem)
+
+
+/**
+ * @summary List guild members from Discord
+ */
+export const GetDiscordMembersQueryParams = zod.object({
+  "limit": zod.coerce.number().optional()
+})
+
+export const GetDiscordMembersResponseItem = zod.object({
+  "id": zod.string(),
+  "username": zod.string(),
+  "displayName": zod.string().nullish(),
+  "avatarUrl": zod.string().nullish(),
+  "roles": zod.array(zod.string()).optional()
+})
+export const GetDiscordMembersResponse = zod.array(GetDiscordMembersResponseItem)
+
+
+/**
  * @summary List moderation logs
  */
 export const ListLogsQueryParams = zod.object({

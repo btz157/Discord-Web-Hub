@@ -247,6 +247,35 @@ export interface BotConfigUpdate {
   muteRoleId?: string;
 }
 
+export interface DiscordChannel {
+  id: string;
+  name: string;
+  type: string;
+  /** @nullable */
+  parentId?: string | null;
+  /** @nullable */
+  parentName?: string | null;
+  position?: number;
+}
+
+export interface DiscordRole {
+  id: string;
+  name: string;
+  color?: string;
+  position?: number;
+  managed?: boolean;
+}
+
+export interface DiscordMember {
+  id: string;
+  username: string;
+  /** @nullable */
+  displayName?: string | null;
+  /** @nullable */
+  avatarUrl?: string | null;
+  roles?: string[];
+}
+
 export interface LogEntry {
   id: string;
   type: string;
@@ -283,6 +312,10 @@ export const ListTicketsStatus = {
 } as const;
 
 export type GetXpLeaderboardParams = {
+limit?: number;
+};
+
+export type GetDiscordMembersParams = {
 limit?: number;
 };
 

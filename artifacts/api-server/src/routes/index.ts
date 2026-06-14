@@ -10,6 +10,7 @@ import xpRouter from "./xp";
 import anunciosRouter from "./anuncios";
 import configRouter from "./config";
 import logsRouter from "./logs";
+import discordRouter from "./discord";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(xpRouter);
 router.use(anunciosRouter);
 router.use(configRouter);
 router.use(logsRouter);
+router.use(discordRouter);
 
 export default router;

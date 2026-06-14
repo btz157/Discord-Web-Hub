@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { getDiscordClient } from "./lib/discord-client";
 
 const rawPort = process.env["PORT"];
 
@@ -14,6 +15,9 @@ const port = Number(rawPort);
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
+
+// Start Discord bot client eagerly so it's ready by the time requests arrive
+getDiscordClient();
 
 app.listen(port, (err) => {
   if (err) {

@@ -26,6 +26,10 @@ import type {
   BotConfig,
   BotConfigUpdate,
   DashboardStats,
+  DiscordChannel,
+  DiscordMember,
+  DiscordRole,
+  GetDiscordMembersParams,
   GetXpLeaderboardParams,
   HealthStatus,
   ListLogsParams,
@@ -2162,6 +2166,244 @@ export const useUpdateConfig = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getUpdateConfigMutationOptions(options));
     }
+
+export const getGetDiscordChannelsUrl = () => {
+
+
+
+
+  return `/api/discord/channels`
+}
+
+/**
+ * @summary List guild channels from Discord
+ */
+export const getDiscordChannels = async ( options?: RequestInit): Promise<DiscordChannel[]> => {
+
+  return customFetch<DiscordChannel[]>(getGetDiscordChannelsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDiscordChannelsQueryKey = () => {
+    return [
+    `/api/discord/channels`
+    ] as const;
+    }
+
+
+export const getGetDiscordChannelsQueryOptions = <TData = Awaited<ReturnType<typeof getDiscordChannels>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDiscordChannels>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDiscordChannelsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDiscordChannels>>> = ({ signal }) => getDiscordChannels({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDiscordChannels>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDiscordChannelsQueryResult = NonNullable<Awaited<ReturnType<typeof getDiscordChannels>>>
+export type GetDiscordChannelsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List guild channels from Discord
+ */
+
+export function useGetDiscordChannels<TData = Awaited<ReturnType<typeof getDiscordChannels>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDiscordChannels>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDiscordChannelsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetDiscordRolesUrl = () => {
+
+
+
+
+  return `/api/discord/roles`
+}
+
+/**
+ * @summary List guild roles from Discord
+ */
+export const getDiscordRoles = async ( options?: RequestInit): Promise<DiscordRole[]> => {
+
+  return customFetch<DiscordRole[]>(getGetDiscordRolesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDiscordRolesQueryKey = () => {
+    return [
+    `/api/discord/roles`
+    ] as const;
+    }
+
+
+export const getGetDiscordRolesQueryOptions = <TData = Awaited<ReturnType<typeof getDiscordRoles>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDiscordRoles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDiscordRolesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDiscordRoles>>> = ({ signal }) => getDiscordRoles({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDiscordRoles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDiscordRolesQueryResult = NonNullable<Awaited<ReturnType<typeof getDiscordRoles>>>
+export type GetDiscordRolesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List guild roles from Discord
+ */
+
+export function useGetDiscordRoles<TData = Awaited<ReturnType<typeof getDiscordRoles>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDiscordRoles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDiscordRolesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetDiscordMembersUrl = (params?: GetDiscordMembersParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/discord/members?${stringifiedParams}` : `/api/discord/members`
+}
+
+/**
+ * @summary List guild members from Discord
+ */
+export const getDiscordMembers = async (params?: GetDiscordMembersParams, options?: RequestInit): Promise<DiscordMember[]> => {
+
+  return customFetch<DiscordMember[]>(getGetDiscordMembersUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDiscordMembersQueryKey = (params?: GetDiscordMembersParams,) => {
+    return [
+    `/api/discord/members`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetDiscordMembersQueryOptions = <TData = Awaited<ReturnType<typeof getDiscordMembers>>, TError = ErrorType<unknown>>(params?: GetDiscordMembersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDiscordMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDiscordMembersQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDiscordMembers>>> = ({ signal }) => getDiscordMembers(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDiscordMembers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDiscordMembersQueryResult = NonNullable<Awaited<ReturnType<typeof getDiscordMembers>>>
+export type GetDiscordMembersQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List guild members from Discord
+ */
+
+export function useGetDiscordMembers<TData = Awaited<ReturnType<typeof getDiscordMembers>>, TError = ErrorType<unknown>>(
+ params?: GetDiscordMembersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDiscordMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDiscordMembersQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getListLogsUrl = (params?: ListLogsParams,) => {
   const normalizedParams = new URLSearchParams();
