@@ -1,22 +1,41 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Bot WS Store - API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: Dashboard operations
+  - name: members
+    description: Member operations
+  - name: warns
+    description: Warn operations
+  - name: tickets
+    description: Ticket operations
+  - name: sorteios
+    description: Sorteio operations
+  - name: roles
+    description: Role operations
+  - name: xp
+    description: XP/Gamificacao operations
+  - name: anuncios
+    description: Anuncio operations
+  - name: config
+    description: Config operations
+  - name: logs
+    description: Log operations
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +43,894 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /dashboard/stats:
+    get:
+      operationId: getDashboardStats
+      tags: [dashboard]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /dashboard/activity:
+    get:
+      operationId: getDashboardActivity
+      tags: [dashboard]
+      summary: Get recent activity feed
+      responses:
+        "200":
+          description: Activity list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /members:
+    get:
+      operationId: listMembers
+      tags: [members]
+      summary: List guild members
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Members list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemberListResponse"
+
+  /members/{discordId}:
+    get:
+      operationId: getMember
+      tags: [members]
+      summary: Get member details
+      parameters:
+        - in: path
+          name: discordId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        "404":
+          description: Not found
+
+  /warns:
+    get:
+      operationId: listWarns
+      tags: [warns]
+      summary: List all warns
+      parameters:
+        - in: query
+          name: discordId
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Warns list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Warn"
+    post:
+      operationId: createWarn
+      tags: [warns]
+      summary: Create a warn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WarnInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Warn"
+
+  /warns/{id}:
+    delete:
+      operationId: deleteWarn
+      tags: [warns]
+      summary: Delete a warn
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  /tickets:
+    get:
+      operationId: listTickets
+      tags: [tickets]
+      summary: List tickets
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [open, closed, all]
+      responses:
+        "200":
+          description: Tickets list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ticket"
+    post:
+      operationId: createTicket
+      tags: [tickets]
+      summary: Create a ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+
+  /tickets/{id}:
+    get:
+      operationId: getTicket
+      tags: [tickets]
+      summary: Get ticket details
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ticket
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateTicket
+      tags: [tickets]
+      summary: Update ticket status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+
+  /sorteios:
+    get:
+      operationId: listSorteios
+      tags: [sorteios]
+      summary: List sorteios
+      responses:
+        "200":
+          description: Sorteios list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sorteio"
+    post:
+      operationId: createSorteio
+      tags: [sorteios]
+      summary: Create a sorteio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SorteioInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sorteio"
+
+  /sorteios/{id}:
+    get:
+      operationId: getSorteio
+      tags: [sorteios]
+      summary: Get sorteio
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sorteio
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sorteio"
+    delete:
+      operationId: deleteSorteio
+      tags: [sorteios]
+      summary: Delete sorteio
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /sorteios/{id}/draw:
+    post:
+      operationId: drawSorteio
+      tags: [sorteios]
+      summary: Draw sorteio winner
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Winner drawn
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sorteio"
+
+  /roles:
+    get:
+      operationId: listRoles
+      tags: [roles]
+      summary: List selectable roles
+      responses:
+        "200":
+          description: Roles list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Role"
+    post:
+      operationId: createRole
+      tags: [roles]
+      summary: Create a selectable role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Role"
+
+  /roles/{id}:
+    delete:
+      operationId: deleteRole
+      tags: [roles]
+      summary: Delete a role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /xp/leaderboard:
+    get:
+      operationId: getXpLeaderboard
+      tags: [xp]
+      summary: Get XP leaderboard
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/XpEntry"
+
+  /xp/{discordId}:
+    get:
+      operationId: getMemberXp
+      tags: [xp]
+      summary: Get member XP
+      parameters:
+        - in: path
+          name: discordId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: XP Entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XpEntry"
+    patch:
+      operationId: updateMemberXp
+      tags: [xp]
+      summary: Update member XP
+      parameters:
+        - in: path
+          name: discordId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/XpUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XpEntry"
+
+  /anuncios:
+    get:
+      operationId: listAnuncios
+      tags: [anuncios]
+      summary: List anuncios
+      responses:
+        "200":
+          description: Anuncios list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Anuncio"
+    post:
+      operationId: createAnuncio
+      tags: [anuncios]
+      summary: Create/send an anuncio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnuncioInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Anuncio"
+
+  /anuncios/{id}:
+    delete:
+      operationId: deleteAnuncio
+      tags: [anuncios]
+      summary: Delete anuncio
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /config:
+    get:
+      operationId: getConfig
+      tags: [config]
+      summary: Get bot configuration
+      responses:
+        "200":
+          description: Config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotConfig"
+    patch:
+      operationId: updateConfig
+      tags: [config]
+      summary: Update bot configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BotConfigUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotConfig"
+
+  /logs:
+    get:
+      operationId: listLogs
+      tags: [logs]
+      summary: List moderation logs
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Logs list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LogEntry"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    DashboardStats:
+      type: object
+      required: [totalMembers, onlineMembers, openTickets, activeWarns, totalXpGiven, sorteiosAtivos]
+      properties:
+        totalMembers:
+          type: integer
+        onlineMembers:
+          type: integer
+        openTickets:
+          type: integer
+        activeWarns:
+          type: integer
+        totalXpGiven:
+          type: integer
+        sorteiosAtivos:
+          type: integer
+        botUptime:
+          type: ["string", "null"]
+        botStatus:
+          type: string
+
+    ActivityItem:
+      type: object
+      required: [id, type, description, timestamp]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        timestamp:
+          type: string
+        discordId:
+          type: ["string", "null"]
+        username:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+
+    Member:
+      type: object
+      required: [discordId, username, joinedAt]
+      properties:
+        discordId:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+        roles:
+          type: array
+          items:
+            type: string
+        xp:
+          type: ["integer", "null"]
+        level:
+          type: ["integer", "null"]
+        warns:
+          type: ["integer", "null"]
+        joinedAt:
+          type: string
+
+    MemberListResponse:
+      type: object
+      required: [members, total, page, totalPages]
+      properties:
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/Member"
+        total:
+          type: integer
+        page:
+          type: integer
+        totalPages:
+          type: integer
+
+    Warn:
+      type: object
+      required: [id, discordId, username, reason, moderatorId, moderatorName, createdAt]
+      properties:
+        id:
+          type: string
+        discordId:
+          type: string
+        username:
+          type: string
+        reason:
+          type: string
+        moderatorId:
+          type: string
+        moderatorName:
+          type: string
+        createdAt:
+          type: string
+
+    WarnInput:
+      type: object
+      required: [discordId, username, reason, moderatorId, moderatorName]
+      properties:
+        discordId:
+          type: string
+        username:
+          type: string
+        reason:
+          type: string
+        moderatorId:
+          type: string
+        moderatorName:
+          type: string
+
+    Ticket:
+      type: object
+      required: [id, discordId, username, category, status, createdAt]
+      properties:
+        id:
+          type: string
+        discordId:
+          type: string
+        username:
+          type: string
+        category:
+          type: string
+        status:
+          type: string
+          enum: [open, closed]
+        subject:
+          type: ["string", "null"]
+        channelId:
+          type: ["string", "null"]
+        closedAt:
+          type: ["string", "null"]
+        closedBy:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    TicketInput:
+      type: object
+      required: [discordId, username, category]
+      properties:
+        discordId:
+          type: string
+        username:
+          type: string
+        category:
+          type: string
+        subject:
+          type: string
+
+    TicketUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [open, closed]
+        closedBy:
+          type: string
+
+    Sorteio:
+      type: object
+      required: [id, prize, createdBy, endAt, status, participants]
+      properties:
+        id:
+          type: string
+        prize:
+          type: string
+        description:
+          type: ["string", "null"]
+        channelId:
+          type: ["string", "null"]
+        messageId:
+          type: ["string", "null"]
+        createdBy:
+          type: string
+        endAt:
+          type: string
+        status:
+          type: string
+          enum: [active, ended, cancelled]
+        winners:
+          type: integer
+        participants:
+          type: integer
+        winnerIds:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+
+    SorteioInput:
+      type: object
+      required: [prize, createdBy, endAt]
+      properties:
+        prize:
+          type: string
+        description:
+          type: string
+        channelId:
+          type: string
+        createdBy:
+          type: string
+        endAt:
+          type: string
+        winners:
+          type: integer
+
+    Role:
+      type: object
+      required: [id, roleId, roleName, description, emoji]
+      properties:
+        id:
+          type: string
+        roleId:
+          type: string
+        roleName:
+          type: string
+        description:
+          type: string
+        emoji:
+          type: string
+        color:
+          type: ["string", "null"]
+        memberCount:
+          type: integer
+
+    RoleInput:
+      type: object
+      required: [roleId, roleName, description, emoji]
+      properties:
+        roleId:
+          type: string
+        roleName:
+          type: string
+        description:
+          type: string
+        emoji:
+          type: string
+        color:
+          type: string
+
+    XpEntry:
+      type: object
+      required: [discordId, username, xp, level]
+      properties:
+        discordId:
+          type: string
+        username:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+        xp:
+          type: integer
+        level:
+          type: integer
+        rank:
+          type: ["integer", "null"]
+
+    XpUpdate:
+      type: object
+      properties:
+        xp:
+          type: integer
+        level:
+          type: integer
+
+    Anuncio:
+      type: object
+      required: [id, title, content, channelId, createdBy, sentAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        channelId:
+          type: string
+        createdBy:
+          type: string
+        sentAt:
+          type: string
+        pingRole:
+          type: ["string", "null"]
+        embedColor:
+          type: ["string", "null"]
+
+    AnuncioInput:
+      type: object
+      required: [title, content, channelId, createdBy]
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        channelId:
+          type: string
+        createdBy:
+          type: string
+        pingRole:
+          type: string
+        embedColor:
+          type: string
+
+    BotConfig:
+      type: object
+      required: [guildId]
+      properties:
+        guildId:
+          type: string
+        prefix:
+          type: string
+        welcomeChannelId:
+          type: ["string", "null"]
+        logChannelId:
+          type: ["string", "null"]
+        modLogChannelId:
+          type: ["string", "null"]
+        ticketCategoryId:
+          type: ["string", "null"]
+        autoroleId:
+          type: ["string", "null"]
+        xpEnabled:
+          type: boolean
+        xpMultiplier:
+          type: number
+        maxWarns:
+          type: integer
+        muteRoleId:
+          type: ["string", "null"]
+
+    BotConfigUpdate:
+      type: object
+      properties:
+        prefix:
+          type: string
+        welcomeChannelId:
+          type: string
+        logChannelId:
+          type: string
+        modLogChannelId:
+          type: string
+        ticketCategoryId:
+          type: string
+        autoroleId:
+          type: string
+        xpEnabled:
+          type: boolean
+        xpMultiplier:
+          type: number
+        maxWarns:
+          type: integer
+        muteRoleId:
+          type: string
+
+    LogEntry:
+      type: object
+      required: [id, type, action, moderatorId, moderatorName, targetId, targetName, createdAt]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        action:
+          type: string
+        moderatorId:
+          type: string
+        moderatorName:
+          type: string
+        targetId:
+          type: string
+        targetName:
+          type: string
+        reason:
+          type: ["string", "null"]
+        createdAt:
+          type: string
