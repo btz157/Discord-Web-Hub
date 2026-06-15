@@ -5,8 +5,8 @@ services:
     region: oregon
     plan: free
     buildCommand: >
-      npm install -g pnpm@latest &&
-      pnpm install --no-frozen-lockfile &&
+      npm install -g pnpm@10.26.1 &&
+      pnpm install --no-frozen-lockfile --config.dangerouslyAllowAllBuilds=true &&
       BASE_PATH=/ pnpm --filter @workspace/bot-dashboard run build &&
       pnpm --filter @workspace/api-server run build &&
       mkdir -p artifacts/api-server/public &&
