@@ -63,7 +63,7 @@ export default function Login() {
             </div>
           )}
 
-          <a href="/api/auth/login?returnTo=/dashboard">
+          <a href="/api/auth/login?returnTo=/dashboard" target="_top">
             <Button
               className="w-full gap-2 text-white font-semibold py-5"
               style={{ background: DISCORD_BLURPLE, borderColor: DISCORD_BLURPLE }}
