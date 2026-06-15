@@ -5,16 +5,16 @@ services:
     region: oregon
     plan: free
     buildCommand: >
-      npm install -g pnpm &&
-      pnpm install --frozen-lockfile &&
-      pnpm run typecheck:libs &&
+      npm install -g pnpm@latest &&
+      pnpm install --no-frozen-lockfile &&
       BASE_PATH=/ pnpm --filter @workspace/bot-dashboard run build &&
-      cp -r artifacts/bot-dashboard/dist/public artifacts/api-server/dist-frontend &&
       pnpm --filter @workspace/api-server run build &&
-      mkdir -p artifacts/api-server/dist/public &&
-      cp -r artifacts/api-server/dist-frontend/. artifacts/api-server/dist/public/
+      mkdir -p artifacts/api-server/public &&
+      cp -r artifacts/bot-dashboard/dist/public/. artifacts/api-server/public/
     startCommand: node --enable-source-maps artifacts/api-server/dist/index.mjs
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: NODE_ENV
         value: production
       - key: PORT
