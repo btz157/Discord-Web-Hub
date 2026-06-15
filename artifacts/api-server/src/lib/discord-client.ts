@@ -1,5 +1,6 @@
-import { Client, GatewayIntentBits, Collection, ChannelType } from "discord.js";
+import { Client, GatewayIntentBits } from "discord.js";
 import { logger } from "./logger";
+import { setupBotEvents } from "../bot/index";
 
 let _client: Client | null = null;
 let _ready = false;
@@ -17,7 +18,7 @@ export function getDiscordClient(): Client {
     ],
   });
 
-  _client.once("ready", (c) => {
+  _client.once("clientReady", (c) => {
     _ready = true;
     logger.info({ tag: c.user.tag, guilds: c.guilds.cache.size }, "Discord bot ready");
   });
@@ -25,6 +26,9 @@ export function getDiscordClient(): Client {
   _client.on("error", (err) => {
     logger.error({ err }, "Discord client error");
   });
+
+  // Register all bot events (commands, XP, tickets, etc.)
+  setupBotEvents(_client);
 
   const token = process.env.DISCORD_TOKEN;
   if (token) {
@@ -46,10 +50,8 @@ export async function getGuild() {
   const client = getDiscordClient();
   const guildId = process.env.DISCORD_GUILD_ID;
   if (!guildId) return null;
-
   try {
-    const guild = await client.guilds.fetch(guildId);
-    return guild;
+    return await client.guilds.fetch(guildId);
   } catch {
     return null;
   }
