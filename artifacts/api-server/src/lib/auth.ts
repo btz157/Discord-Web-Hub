@@ -1,5 +1,6 @@
-import { pool } from "@workspace/db";
-import type { Request, Response } from "express";
+import type { Request } from "express";
+import { getDiscordClient } from "./discord-client";
+import { logger } from "./logger";
 
 export interface DiscordUser {
   id: string;
@@ -20,7 +21,7 @@ declare module "express-session" {
 const DISCORD_API = "https://discord.com/api/v10";
 
 export function getRedirectUri(): string {
-  // Render sets RENDER_EXTERNAL_URL automatically (e.g. https://ws-store-bot.onrender.com)
+  // Render sets this automatically (e.g. https://ws-store-bot.onrender.com)
   if (process.env.RENDER_EXTERNAL_URL) {
     return `${process.env.RENDER_EXTERNAL_URL}/api/auth/callback`;
   }
@@ -28,7 +29,7 @@ export function getRedirectUri(): string {
   if (process.env.REPLIT_DOMAINS) {
     return `https://${process.env.REPLIT_DOMAINS.split(",")[0]}/api/auth/callback`;
   }
-  // Manual override (useful for any other host)
+  // Manual override
   if (process.env.APP_URL) {
     return `${process.env.APP_URL}/api/auth/callback`;
   }
@@ -55,7 +56,7 @@ export async function exchangeCode(code: string): Promise<string> {
     throw new Error(`Token exchange failed: ${err}`);
   }
 
-  const data = await res.json() as { access_token: string };
+  const data = (await res.json()) as { access_token: string };
   return data.access_token;
 }
 
@@ -68,11 +69,24 @@ export async function fetchDiscordUser(accessToken: string): Promise<DiscordUser
   return res.json() as Promise<DiscordUser>;
 }
 
-export async function isGuildMember(accessToken: string, guildId: string): Promise<boolean> {
-  const res = await fetch(`${DISCORD_API}/users/@me/guilds`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!res.ok) return false;
-  const guilds = await res.json() as Array<{ id: string }>;
-  return guilds.some((g) => g.id === guildId);
+/**
+ * Checks guild membership using the bot client directly — much more reliable
+ * than checking via the user's OAuth token (which can miss servers due to pagination).
+ * Falls back to allowing access if DISCORD_GUILD_ID is not set or bot is not ready.
+ */
+export async function isGuildMember(userId: string): Promise<boolean> {
+  const guildId = process.env.DISCORD_GUILD_ID;
+  if (!guildId) return true; // no guild restriction configured
+
+  try {
+    const client = getDiscordClient();
+    const guild = client.guilds.cache.get(guildId);
+    if (!guild) return true; // bot not in guild, allow through
+
+    const member = await guild.members.fetch(userId).catch(() => null);
+    return member !== null;
+  } catch (err) {
+    logger.warn({ err, userId }, "isGuildMember check failed — allowing through");
+    return true; // fail open: let the user in if check errors
+  }
 }
