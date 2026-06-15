@@ -20,9 +20,18 @@ declare module "express-session" {
 const DISCORD_API = "https://discord.com/api/v10";
 
 export function getRedirectUri(): string {
-  const domains = process.env.REPLIT_DOMAINS?.split(",")[0];
-  if (domains) return `https://${domains}/api/auth/callback`;
-  // fallback for local dev
+  // Render sets RENDER_EXTERNAL_URL automatically (e.g. https://ws-store-bot.onrender.com)
+  if (process.env.RENDER_EXTERNAL_URL) {
+    return `${process.env.RENDER_EXTERNAL_URL}/api/auth/callback`;
+  }
+  // Replit sets REPLIT_DOMAINS (comma-separated, first is the primary domain)
+  if (process.env.REPLIT_DOMAINS) {
+    return `https://${process.env.REPLIT_DOMAINS.split(",")[0]}/api/auth/callback`;
+  }
+  // Manual override (useful for any other host)
+  if (process.env.APP_URL) {
+    return `${process.env.APP_URL}/api/auth/callback`;
+  }
   return `http://localhost:80/api/auth/callback`;
 }
 
